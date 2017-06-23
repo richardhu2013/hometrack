@@ -14,19 +14,16 @@ Run `node run` to start the web server
 
 ## Test
 ### With nodeunit to test
-Run `./q.sh rest_hometrack_test.js`, which will read testfiles/request.json as json data sent to server and get response of filtered homes.
+Run `./q.sh rest_hometrack_test.js`, which will read testfiles/request.json and testfiles/wronerequest.json as json data sent to server and get response of filtered ones.
 
 To test REST API in different URL, simply change host to your one in rest_hometrack_test.js.
 
 ### With curl to test
-curl -vX POST http://xxxx:8888/hometrack -d @testfiles/request.json --header "Content-Type: application/json"
+curl -vX POST http://URL:8888/hometrack -d @testfiles/request.json --header "Content-Type: application/json"
 
-curl -vX POST http://xxxx:8888/hometrack -d "{dd:sdfsd}"  --header "Content-Type: application/json"
+curl -vX POST http://URL:8888/hometrack -d "{dd:sdfsd}"  --header "Content-Type: application/json"
 
 Note:
-The valid item should have all attribute defined in schema, if there is anyone with missing attribute, we will see the whole json data invalid.
+The valid item should have all attributes defined in schema, if there is item with missing attributes, the whole json data is regarded as invalid.
 
-In this design, if no items with workflow completed and type htv, it returns empty array.
-
-
-
+In this design, if no items with both workflow `completed` and type `htv`, it returns empty array.
