@@ -32,8 +32,22 @@ module.exports = () => {
     method: 'POST',
     path: '/hometrack',
     handler: (request, reply) => {
-      var validateResult = validator.validateResult(request.payload, schema);
-      if (!validateResult.valid) {
+      // Check payload and it is an array
+      if (!request.payload.hasOwnProperty('payload') || !Array.isArray(request.payload.payload)) {
+        return reply({
+          error: 'Could not decode request: JSON parsing failed'
+        }).code(400);
+      }
+      // Each item is validated with schema
+      var invalid = false;
+      var validateResult;
+      request.payload.payload.forEach((x) => {
+        validateResult = validator.validateResult(x, schema);
+        if (!validateResult.valid) {
+          invalid = true;
+        }
+      });
+      if (invalid) {
         return reply({
           error: 'Could not decode request: JSON parsing failed'
         }).code(400);

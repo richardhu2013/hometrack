@@ -4,7 +4,7 @@
 Filter homes based on workflow and type
 
 ## Installation
-Run insall.sh to install nodejs
+Run `insall.sh` to install nodejs
 Run `npm install` from project root
 Run `node run` to start the web server
 
@@ -24,7 +24,7 @@ curl -vX POST http://xxxx:8888/hometrack -d @testfiles/request.json --header "Co
 curl -vX POST http://xxxx:8888/hometrack -d "{dd:sdfsd}"  --header "Content-Type: application/json"
 
 Note:
-In this design, it allows user sending {"payload": [addresses]} and {[addresses]}, means, it will try to see if there is `payload` in the data.
+The valid item should have all attribute defined in schema, if there is anyone with missing attribute, we will see the whole json data invalid.
 
 In this design, if no items with workflow completed and type htv, it returns empty array.
 
