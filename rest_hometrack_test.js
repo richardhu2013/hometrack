@@ -17,7 +17,7 @@ exports.rest_hometrack = {
     hometrackServer.start(test.done);
   },
 
-  'post a list of home addresses and return ones with workflow completed and type htv': (test) => {
+  'post a list of home addresses and return 2 with workflow completed and type htv': (test) => {
     hometrackClient.post(
       test,
       'hometrack', {
@@ -29,7 +29,21 @@ exports.rest_hometrack = {
       });
   },
 
-  'verify wrong format json data is handled ': (test) => {
+  'Verify missing attribute is checked and return error message': (test) => {
+    hometrackClient.post(
+      test,
+      'hometrack', {
+        data: fs.readFileSync('./testfiles/wrongrequest.json', 'utf8')
+      }, {
+        status: 400
+      }, (res) => {
+        var reply = JSON.parse(res.body);
+        test.equal(reply.error, 'Could not decode request: JSON parsing failed');
+        test.done();
+      });
+  },
+
+  'Verify normal wrong format json data is not accepted and return error message ': (test) => {
     hometrackClient.post(
       test,
       'hometrack', {
