@@ -3,6 +3,8 @@
 var Hapi = require('hapi');
 var Path = require('path');
 var async = require('async');
+var validator = require('tv4');
+var schema = require('./payload_schema.js');
 var _ = require('lodash');
 
 module.exports = () => {
@@ -30,49 +32,38 @@ module.exports = () => {
     method: 'POST',
     path: '/hometrack',
     handler: (request, reply) => {
-      var isWrongFormat = false;
-      // Allow payload:[addresses] and [addresses]
-      var homes = request.payload.hasOwnProperty('payload') ? request.payload.payload : request.payload;
-      if (!Array.isArray(homes)) {
-        isWrongFormat = true;
-      }
-      if (isWrongFormat) {
+      var validateResult = validator.validateResult(request.payload, schema);
+      if (!validateResult.valid) {
         return reply({
           error: 'Could not decode request: JSON parsing failed'
         }).code(400);
       }
 
-      var completedWorkflows = _.filter(homes, {
+      var completedWorkflows = _.filter(request.payload.payload, {
         workflow: 'completed',
         type: 'htv'
       });
 
-      var filteredHomes = [];
+      var completedProperties = [];
       if (completedWorkflows !== undefined) {
-        // concatenate address
-        filteredHomes = _.map(completedWorkflows, (x) => {
+        completedProperties = _.map(completedWorkflows, (x) => {
           var objs = {};
-          objs.concataddress = '';
-          if (x.hasOwnProperty('address')) {
-            var concataddress = '';
-            if (x.address.hasOwnProperty('buildingNumber')) concataddress += x.address.buildingNumber;
-            concataddress += ' ';
-            if (x.address.hasOwnProperty('street')) concataddress += x.address.street;
-            concataddress += ' ';
-            if (x.address.hasOwnProperty('suburb')) concataddress += x.address.suburb;
-            concataddress += ' ';
-            if (x.address.hasOwnProperty('state')) concataddress += x.address.state;
-            concataddress += ' ';
-            if (x.address.hasOwnProperty('postcode')) concataddress += x.address.postcode;
-            objs.concataddress = concataddress;
-          }
+          objs.concataddress = x.address.buildingNumber;
+          objs.concataddress += ' ';
+          objs.concataddress += x.address.street;
+          objs.concataddress += ' ';
+          objs.concataddress += x.address.suburb;
+          objs.concataddress += ' ';
+          objs.concataddress += x.address.state;
+          objs.concataddress += ' ';
+          objs.concataddress += x.address.postcode;
           objs.type = x.type;
           objs.workflow = x.workflow;
           return objs;
         });
       }
       reply({
-        response: filteredHomes
+        response: completedProperties
       });
     }
   });
